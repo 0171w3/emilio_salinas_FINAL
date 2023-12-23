@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seminario Django</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+</head>
+<body> 
+    <div class="container">
+        <h1 class="text-center">Seminario - Emilio Salinas</h1>
+        <hr>
+
+        {% if messages %}
+            <div class="row">
+                <div class="col-md-12">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+    <!-- Botón para abrir el modal de inscripción -->
+<center><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#inscripcionModal">
+    Inscribir participante
+</button></center>
+<br>
+<!-- Botón para abrir el modal de creación de institución -->
+<center><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#institucionModal">
+    Crear institución
+</button></center>
+
+<!-- Modal de inscripción -->
+<div class="modal fade" id="inscripcionModal" tabindex="-1" role="dialog" aria-labelledby="inscripcionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inscripcionModalLabel">Inscribir participante</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenido del formulario de inscripción -->
+                <form method="post" action="{% url 'index' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="inscrito" value="true">
+
+                    <div class="form-group">
+                        <label for="id_nombre">Nombre:</label>
+                        {{ form_inscrito.nombre }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_telefono">Teléfono:</label>
+                        {{ form_inscrito.telefono }}
+                        <small class="form-text text-muted">Máximo 9 caracteres.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_institucion">Institución:</label>
+                        {{ form_inscrito.institucion }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_estado">Estado:</label>
+                        {{ form_inscrito.estado }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_observacion">Observación:</label>
+                        {{ form_inscrito.observacion }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Inscribir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de creación de institución -->
+<div class="modal fade" id="institucionModal" tabindex="-1" role="dialog" aria-labelledby="institucionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="institucionModalLabel">Crear institución</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'index' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="institucion" value="true">
+                    {{ form_institucion.as_p }}
+                    <button type="submit" class="btn btn-primary">Crear</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <hr>
+
+        <center><h2>Listado de participantes</h2></center>
+        <table id="inscritos-table" class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Fecha inscripción</th>
+                        <th>Institución</th>
+                        <th>Hora inscripción</th>
+                        <th>Estado</th>
+                        <th>Observación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inscrito in inscritos %}
+                        <tr>
+                            <td>{{ inscrito.id }}</td>
+                            <td>{{ inscrito.nombre }}</td>
+                            <td>{{ inscrito.telefono }}</td>
+                            <td>{{ inscrito.fecha_inscripcion }}</td>
+                            <td>{{ inscrito.institucion }}</td>
+                            <td>{{ inscrito.hora_inscripcion }}</td>
+                            <td>{{ inscrito.get_estado_display }}</td>
+                            <td>{{ inscrito.observacion }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+</body>
+</html>
+<script>
+    $(document).ready(function() {
+        $('#inscritos-table').DataTable();
+    });
+</script>
+
